@@ -13,30 +13,32 @@ import {
   BarChart3, 
   User,
   Sparkles,
-  LayoutGrid,
-  Activity,
-  Award,
-  Target
+  LayoutGrid
 } from 'lucide-react';
 
 export default function FanAtlasApp() {
   // Navigation active tab: 'home' | 'games' | 'predict' | 'leaderboard' | 'profile'
-  const [activeTab, setActiveTab] = useState<'home' | 'games' | 'predict' | 'leaderboard' | 'profile'>('games');
+  const [activeTab, setActiveTab] = useState<'home' | 'games' | 'predict' | 'leaderboard' | 'profile'>('home');
 
-  // Home state
+  // Sport filters
   const [selectedSportHome, setSelectedSportHome] = useState<string>('football');
+  const [selectedSportGames, setSelectedSportGames] = useState<string>('football');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
-  // Games page sport filter
-  const [selectedSportGames, setSelectedSportGames] = useState<string>('football');
+  const handleTabChange = (tab: 'home' | 'games' | 'predict' | 'leaderboard' | 'profile') => {
+    setActiveTab(tab);
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+  };
 
   return (
     <div className="w-full max-w-[430px] min-h-screen bg-[#060911] text-white flex flex-col relative pb-24 shadow-2xl selection:bg-purple-600 selection:text-white font-sans mx-auto">
-      {/* 1. Global Header (Common across screens) */}
+      {/* 1. Global Header (Common across all views) */}
       <header className="flex items-center justify-between px-5 pt-5 pb-3 select-none">
         {/* Brand Logo */}
         <div 
-          onClick={() => setActiveTab('home')} 
+          onClick={() => handleTabChange('home')} 
           className="flex items-center space-x-2.5 cursor-pointer"
         >
           <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-[#3B82F6] via-[#6366F1] to-[#8B5CF6] p-[1.5px] shadow-[0_0_15px_rgba(99,102,241,0.4)] flex items-center justify-center">
@@ -66,7 +68,7 @@ export default function FanAtlasApp() {
           </span>
         </div>
 
-        {/* Action Icons */}
+        {/* Action Icons (Static / Non-clickable dummy) */}
         <div className="flex items-center space-x-3.5">
           {/* Notification Bell */}
           <div className="relative p-1.5 text-gray-300">
@@ -89,7 +91,467 @@ export default function FanAtlasApp() {
         </div>
       </header>
 
-      {/* ===================== VIEW 1: GAMES PAGE (NEW FIGMA DESIGN) ===================== */}
+      {/* ===================== VIEW 1: HOME PAGE (FIGMA SCREENSHOT 2) ===================== */}
+      {activeTab === 'home' && (
+        <div className="flex flex-col space-y-1 select-none">
+          {/* 1. Search Bar */}
+          <section className="px-5 py-2">
+            <div className="flex items-center w-full bg-[#0F1422] border border-[#1B2338] rounded-2xl px-3.5 py-2.5 shadow-inner">
+              <Search className="w-4 h-4 text-gray-400 shrink-0 mr-2.5 stroke-[2]" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search teams, leagues, players..."
+                className="w-full bg-transparent text-[13px] text-gray-200 placeholder-gray-400 focus:outline-none"
+              />
+            </div>
+          </section>
+
+          {/* 2. MY SPORTS */}
+          <section className="px-5 py-2.5 select-none">
+            <div className="flex items-center justify-between mb-2.5">
+              <h2 className="text-[12px] font-bold tracking-wider text-gray-400 uppercase">
+                MY SPORTS
+              </h2>
+              <span className="text-[12px] font-semibold text-purple-400 cursor-pointer">
+                Edit
+              </span>
+            </div>
+
+            <div className="flex items-center space-x-2.5 overflow-x-auto no-scrollbar pb-1">
+              {/* Football (Active Purple Pill) */}
+              <button
+                onClick={() => setSelectedSportHome('football')}
+                className={`flex flex-col items-center justify-center min-w-[76px] h-[70px] rounded-2xl p-2 transition-all border ${
+                  selectedSportHome === 'football'
+                    ? 'bg-[#5533EB] border-indigo-400/60 shadow-[0_0_20px_rgba(85,51,235,0.45)] text-white'
+                    : 'bg-[#0E1424] border-[#1A2338] text-gray-300'
+                }`}
+              >
+                <div className="w-8 h-8 flex items-center justify-center mb-0.5">
+                  <span className="text-[17px] leading-none">⚽</span>
+                </div>
+                <span className="text-[11px] font-medium tracking-tight whitespace-nowrap">
+                  Football
+                </span>
+              </button>
+
+              {/* Basketball */}
+              <button
+                onClick={() => setSelectedSportHome('basketball')}
+                className={`flex flex-col items-center justify-center min-w-[76px] h-[70px] rounded-2xl p-2 transition-all border ${
+                  selectedSportHome === 'basketball'
+                    ? 'bg-[#5533EB] border-indigo-400/60 shadow-[0_0_20px_rgba(85,51,235,0.45)] text-white'
+                    : 'bg-[#0E1424] border-[#1A2338] text-gray-300'
+                }`}
+              >
+                <div className="w-8 h-8 flex items-center justify-center mb-0.5">
+                  <span className="text-[17px] leading-none">🏀</span>
+                </div>
+                <span className="text-[11px] font-medium tracking-tight whitespace-nowrap">
+                  Basketball
+                </span>
+              </button>
+
+              {/* Formula 1 */}
+              <button
+                onClick={() => setSelectedSportHome('f1')}
+                className={`flex flex-col items-center justify-center min-w-[76px] h-[70px] rounded-2xl p-2 transition-all border ${
+                  selectedSportHome === 'f1'
+                    ? 'bg-[#5533EB] border-indigo-400/60 shadow-[0_0_20px_rgba(85,51,235,0.45)] text-white'
+                    : 'bg-[#0E1424] border-[#1A2338] text-gray-300'
+                }`}
+              >
+                <div className="w-8 h-8 flex items-center justify-center mb-0.5">
+                  <span className="text-[13px] font-black text-red-500 italic tracking-tighter">F1</span>
+                </div>
+                <span className="text-[11px] font-medium tracking-tight whitespace-nowrap">
+                  Formula 1
+                </span>
+              </button>
+
+              {/* Cricket */}
+              <button
+                onClick={() => setSelectedSportHome('cricket')}
+                className={`flex flex-col items-center justify-center min-w-[76px] h-[70px] rounded-2xl p-2 transition-all border ${
+                  selectedSportHome === 'cricket'
+                    ? 'bg-[#5533EB] border-indigo-400/60 shadow-[0_0_20px_rgba(85,51,235,0.45)] text-white'
+                    : 'bg-[#0E1424] border-[#1A2338] text-gray-300'
+                }`}
+              >
+                <div className="w-8 h-8 flex items-center justify-center mb-0.5">
+                  <span className="text-[17px] leading-none">🏏</span>
+                </div>
+                <span className="text-[11px] font-medium tracking-tight whitespace-nowrap">
+                  Cricket
+                </span>
+              </button>
+
+              {/* + More */}
+              <button
+                onClick={() => setSelectedSportHome('more')}
+                className={`flex flex-col items-center justify-center min-w-[70px] h-[70px] rounded-2xl p-2 transition-all border ${
+                  selectedSportHome === 'more'
+                    ? 'bg-[#5533EB] border-indigo-400/60 shadow-[0_0_20px_rgba(85,51,235,0.45)] text-white'
+                    : 'bg-[#0E1424] border-[#1A2338] text-gray-400'
+                }`}
+              >
+                <div className="w-8 h-8 flex items-center justify-center text-[15px] font-bold text-purple-400 mb-0.5">
+                  +
+                </div>
+                <span className="text-[11px] font-medium whitespace-nowrap">
+                  More
+                </span>
+              </button>
+            </div>
+          </section>
+
+          {/* 3. LIVE NOW (37) */}
+          <section className="px-5 py-2.5 select-none">
+            <div className="flex items-center space-x-2 mb-2.5">
+              <h2 className="text-[13px] font-extrabold tracking-wider text-emerald-400 uppercase">
+                LIVE NOW
+              </h2>
+              <span className="px-1.5 py-0.2 bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 text-[10px] font-bold rounded-full">
+                37
+              </span>
+            </div>
+
+            <div className="flex items-stretch space-x-3 overflow-x-auto no-scrollbar pb-1.5">
+              {/* Liverpool vs Arsenal */}
+              <div className="flex-shrink-0 w-[138px] bg-[#0E1424] border border-[#1A243A] rounded-2xl p-3 flex flex-col justify-between shadow-lg">
+                <div className="flex items-center justify-end w-full mb-1">
+                  <span className="inline-flex items-center px-1.5 py-0.5 rounded-full bg-[#E11D48] text-white text-[9px] font-bold tracking-tight">
+                    <span className="w-1.5 h-1.5 rounded-full bg-white mr-1" />
+                    LIVE
+                  </span>
+                </div>
+                <div className="flex items-center justify-center space-x-2 my-1">
+                  <div className="w-7 h-7 rounded-full bg-red-950/30 border border-red-500/30 p-1 flex items-center justify-center">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg" alt="Liverpool" className="w-5 h-5 object-contain" />
+                  </div>
+                  <span className="text-[9px] font-bold text-gray-500">vs</span>
+                  <div className="w-7 h-7 rounded-full bg-red-950/30 border border-red-500/30 p-1 flex items-center justify-center">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg" alt="Arsenal" className="w-5 h-5 object-contain" />
+                  </div>
+                </div>
+                <div className="text-center my-0.5">
+                  <div className="text-[15px] font-black text-white tracking-wider">2 - 1</div>
+                  <div className="text-[10px] text-gray-400 truncate mt-0.5">Liverpool vs Arsenal</div>
+                </div>
+                <div className="text-center mt-1">
+                  <span className="text-[10px] font-bold text-emerald-400">78&apos;</span>
+                </div>
+              </div>
+
+              {/* Celtics vs Mavericks */}
+              <div className="flex-shrink-0 w-[138px] bg-[#0E1424] border border-[#1A243A] rounded-2xl p-3 flex flex-col justify-between shadow-lg">
+                <div className="flex items-center justify-end w-full mb-1">
+                  <span className="inline-flex items-center px-1.5 py-0.5 rounded-full bg-[#E11D48] text-white text-[9px] font-bold tracking-tight">
+                    <span className="w-1.5 h-1.5 rounded-full bg-white mr-1" />
+                    LIVE
+                  </span>
+                </div>
+                <div className="flex items-center justify-center my-1">
+                  <div className="w-8 h-8 rounded-lg bg-blue-950/40 border border-blue-500/30 p-1 flex items-center justify-center">
+                    <span className="text-[11px] font-black text-blue-400 tracking-wider">NBA</span>
+                  </div>
+                </div>
+                <div className="text-center my-0.5">
+                  <div className="text-[14px] font-black text-white tracking-wide">112 - 108</div>
+                  <div className="text-[10px] text-gray-400 truncate mt-0.5">Celtics vs Mavericks</div>
+                </div>
+                <div className="text-center mt-1">
+                  <span className="text-[10px] font-bold text-emerald-400">4th 2:45</span>
+                </div>
+              </div>
+
+              {/* Monaco GP */}
+              <div className="flex-shrink-0 w-[138px] bg-[#0E1424] border border-[#1A243A] rounded-2xl p-3 flex flex-col justify-between shadow-lg">
+                <div className="flex items-center justify-end w-full mb-1">
+                  <span className="inline-flex items-center px-1.5 py-0.5 rounded-full bg-[#E11D48] text-white text-[9px] font-bold tracking-tight">
+                    <span className="w-1.5 h-1.5 rounded-full bg-white mr-1" />
+                    LIVE
+                  </span>
+                </div>
+                <div className="flex items-center justify-center my-1">
+                  <div className="w-10 h-7 rounded-lg bg-red-950/40 border border-red-500/30 p-1 flex items-center justify-center">
+                    <span className="text-[13px] font-black italic text-red-500 tracking-tighter">F1</span>
+                  </div>
+                </div>
+                <div className="text-center my-0.5">
+                  <div className="text-[14px] font-black text-emerald-400 tracking-wider">Q2</div>
+                  <div className="text-[10px] text-gray-400 truncate mt-0.5">Monaco Grand Prix</div>
+                </div>
+                <div className="text-center mt-1">
+                  <span className="text-[10px] font-bold text-emerald-400 font-mono">12:34</span>
+                </div>
+              </div>
+
+              {/* IND vs AUS */}
+              <div className="flex-shrink-0 w-[138px] bg-[#0E1424] border border-[#1A243A] rounded-2xl p-3 flex flex-col justify-between shadow-lg">
+                <div className="flex items-center justify-end w-full mb-1">
+                  <span className="inline-flex items-center px-1.5 py-0.5 rounded-full bg-[#E11D48] text-white text-[9px] font-bold tracking-tight">
+                    <span className="w-1.5 h-1.5 rounded-full bg-white mr-1" />
+                    LIVE
+                  </span>
+                </div>
+                <div className="flex items-center justify-center space-x-2 my-1">
+                  <div className="w-7 h-7 rounded-full bg-yellow-950/30 border border-yellow-500/30 p-1 flex items-center justify-center">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="https://upload.wikimedia.org/wikipedia/en/4/41/Flag_of_India.svg" alt="India" className="w-5 h-5 object-contain" />
+                  </div>
+                  <span className="text-[9px] font-bold text-gray-500">-</span>
+                  <div className="w-7 h-7 rounded-full bg-green-950/30 border border-green-500/30 p-1 flex items-center justify-center">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/8/88/Flag_of_Australia_%28converted%29.svg" alt="Australia" className="w-5 h-5 object-contain" />
+                  </div>
+                </div>
+                <div className="text-center my-0.5">
+                  <div className="text-[11px] font-bold text-gray-300">IND <span className="text-gray-500 text-[9px]">vs</span> AUS</div>
+                </div>
+                <div className="text-center mt-1">
+                  <span className="text-[10px] font-bold text-emerald-400 font-mono">32/1 (6.2)</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* 4. CONTINUE LISTENING */}
+          <section className="px-5 py-2.5 select-none">
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-[12px] font-bold tracking-wider text-gray-400 uppercase">
+                CONTINUE LISTENING
+              </h2>
+              <span className="text-gray-400"><Headphones className="w-4 h-4" /></span>
+            </div>
+
+            <div className="w-full bg-[#0D1322] border border-[#1B253B] rounded-2xl p-3 flex items-center justify-between shadow-md">
+              <div className="flex items-center space-x-3 flex-1 min-w-0 mr-3">
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-b from-[#181D33] to-[#0A0D18] border border-white/10 flex flex-col items-center justify-between p-1.5 shrink-0 shadow-inner">
+                  <div className="flex items-center justify-center space-x-1 mt-0.5">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg" alt="" className="w-4 h-4 object-contain" />
+                    <span className="text-[8px] text-gray-500 font-bold">vs</span>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="https://upload.wikimedia.org/wikipedia/en/c/cc/Chelsea_FC.svg" alt="" className="w-4 h-4 object-contain" />
+                  </div>
+                  <div className="flex items-end justify-center space-x-[2px] h-3 w-full px-1">
+                    {[35, 75, 50, 90, 65, 100, 70, 45, 80, 55, 30].map((h, i) => (
+                      <span key={i} className="w-[2px] rounded-full bg-gradient-to-t from-indigo-500 to-purple-400" style={{ height: `${h}%` }} />
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-[13px] font-bold text-white truncate tracking-tight">Arsenal vs Chelsea</h3>
+                  <p className="text-[11px] text-gray-400 truncate mb-1.5">AI Commentary</p>
+                  <div className="flex items-center space-x-2">
+                    <div className="flex-1 h-1 bg-[#1C253B] rounded-full overflow-hidden">
+                      <div className="h-full bg-[#8B5CF6] rounded-full" style={{ width: '52%' }} />
+                    </div>
+                    <span className="text-[10px] text-gray-400 font-mono tracking-tight shrink-0">12:34 / 24:15</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="w-9 h-9 rounded-full bg-transparent border border-purple-500/80 text-purple-400 flex items-center justify-center shrink-0 shadow-[0_0_10px_rgba(139,92,246,0.3)]">
+                <Play className="w-4 h-4 fill-purple-400 text-purple-400 ml-0.5" />
+              </div>
+            </div>
+          </section>
+
+          {/* 5. UPCOMING FOR YOU */}
+          <section className="px-5 py-2.5 select-none">
+            <div className="flex items-center justify-between mb-2.5">
+              <h2 className="text-[12px] font-bold tracking-wider text-gray-400 uppercase">
+                UPCOMING FOR YOU
+              </h2>
+              <span className="text-[12px] font-semibold text-purple-400 cursor-pointer">
+                See all
+              </span>
+            </div>
+
+            <div className="flex items-stretch space-x-3 overflow-x-auto no-scrollbar pb-1.5">
+              {/* Card 1: Arsenal vs Chelsea */}
+              <div className="flex-shrink-0 w-[150px] bg-[#0E1424] border border-[#1A243A] rounded-2xl p-3 flex flex-col justify-between shadow-md">
+                <div className="text-center mb-1.5">
+                  <span className="text-[10px] text-gray-400 font-medium tracking-tight">
+                    Today • 8:00 PM
+                  </span>
+                </div>
+                <div className="flex items-center justify-center space-x-2.5 my-1">
+                  <div className="w-8 h-8 rounded-full bg-[#161D2E] border border-white/10 p-1 flex items-center justify-center">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg" alt="" className="w-5 h-5 object-contain" />
+                  </div>
+                  <span className="text-[9px] text-gray-500 font-bold">vs</span>
+                  <div className="w-8 h-8 rounded-full bg-[#161D2E] border border-white/10 p-1 flex items-center justify-center">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="https://upload.wikimedia.org/wikipedia/en/c/cc/Chelsea_FC.svg" alt="" className="w-5 h-5 object-contain" />
+                  </div>
+                </div>
+                <div className="text-center my-1">
+                  <div className="text-[11px] font-bold text-gray-200 truncate">
+                    Arsenal <span className="text-gray-500 font-normal">vs</span> Chelsea
+                  </div>
+                </div>
+                <div className="text-center mt-0.5">
+                  <span className="text-[10px] text-gray-400 font-medium truncate block">
+                    Premier League
+                  </span>
+                </div>
+              </div>
+
+              {/* Card 2: Real Madrid vs Barcelona */}
+              <div className="flex-shrink-0 w-[150px] bg-[#0E1424] border border-[#1A243A] rounded-2xl p-3 flex flex-col justify-between shadow-md">
+                <div className="text-center mb-1.5">
+                  <span className="text-[10px] text-gray-400 font-medium tracking-tight">
+                    Tomorrow • 10:15 PM
+                  </span>
+                </div>
+                <div className="flex items-center justify-center space-x-2.5 my-1">
+                  <div className="w-8 h-8 rounded-full bg-[#161D2E] border border-white/10 p-1 flex items-center justify-center">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg" alt="" className="w-5 h-5 object-contain" />
+                  </div>
+                  <span className="text-[9px] text-gray-500 font-bold">vs</span>
+                  <div className="w-8 h-8 rounded-full bg-[#161D2E] border border-white/10 p-1 flex items-center justify-center">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg" alt="" className="w-5 h-5 object-contain" />
+                  </div>
+                </div>
+                <div className="text-center my-1">
+                  <div className="text-[11px] font-bold text-gray-200 truncate">
+                    Real Madrid <span className="text-gray-500 font-normal">vs</span> Barcelona
+                  </div>
+                </div>
+                <div className="text-center mt-0.5">
+                  <span className="text-[10px] text-gray-400 font-medium truncate block">
+                    La Liga
+                  </span>
+                </div>
+              </div>
+
+              {/* Card 3: AC Milan vs Inter Milan */}
+              <div className="flex-shrink-0 w-[150px] bg-[#0E1424] border border-[#1A243A] rounded-2xl p-3 flex flex-col justify-between shadow-md">
+                <div className="text-center mb-1.5">
+                  <span className="text-[10px] text-gray-400 font-medium tracking-tight">
+                    Tomorrow • 6:45 PM
+                  </span>
+                </div>
+                <div className="flex items-center justify-center space-x-2.5 my-1">
+                  <div className="w-8 h-8 rounded-full bg-[#161D2E] border border-white/10 p-1 flex items-center justify-center">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/d/d0/Logo_of_AC_Milan.svg" alt="" className="w-5 h-5 object-contain" />
+                  </div>
+                  <span className="text-[9px] text-gray-500 font-bold">vs</span>
+                  <div className="w-8 h-8 rounded-full bg-[#161D2E] border border-white/10 p-1 flex items-center justify-center">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/0/05/FC_Internazionale_Milano_2021.svg" alt="" className="w-5 h-5 object-contain" />
+                  </div>
+                </div>
+                <div className="text-center my-1">
+                  <div className="text-[11px] font-bold text-gray-200 truncate">
+                    AC Milan <span className="text-gray-500 font-normal">vs</span> Inter Milan
+                  </div>
+                </div>
+                <div className="text-center mt-0.5">
+                  <span className="text-[10px] text-gray-400 font-medium truncate block">
+                    Serie A
+                  </span>
+                </div>
+              </div>
+
+              {/* Card 4: India vs Australia */}
+              <div className="flex-shrink-0 w-[150px] bg-[#0E1424] border border-[#1A243A] rounded-2xl p-3 flex flex-col justify-between shadow-md">
+                <div className="text-center mb-1.5">
+                  <span className="text-[10px] text-gray-400 font-medium tracking-tight">
+                    Sun • 2:00 PM
+                  </span>
+                </div>
+                <div className="flex items-center justify-center space-x-2.5 my-1">
+                  <div className="w-8 h-8 rounded-full bg-[#161D2E] border border-white/10 p-1 flex items-center justify-center">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="https://upload.wikimedia.org/wikipedia/en/4/41/Flag_of_India.svg" alt="" className="w-5 h-5 object-contain" />
+                  </div>
+                  <span className="text-[9px] text-gray-500 font-bold">vs</span>
+                  <div className="w-8 h-8 rounded-full bg-[#161D2E] border border-white/10 p-1 flex items-center justify-center">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/8/88/Flag_of_Australia_%28converted%29.svg" alt="" className="w-5 h-5 object-contain" />
+                  </div>
+                </div>
+                <div className="text-center my-1">
+                  <div className="text-[11px] font-bold text-gray-200 truncate">
+                    India <span className="text-gray-500 font-normal">vs</span> Australia
+                  </div>
+                </div>
+                <div className="text-center mt-0.5">
+                  <span className="text-[10px] text-gray-400 font-medium truncate block">
+                    3rd ODI
+                  </span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* 6. TRENDING */}
+          <section className="px-5 py-2 select-none">
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-[12px] font-bold tracking-wider text-gray-400 uppercase">
+                TRENDING
+              </h2>
+            </div>
+
+            <div className="flex items-center space-x-2 overflow-x-auto no-scrollbar pb-1">
+              <button className="flex items-center space-x-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#2F1F63] to-[#251D52] border border-purple-500/40 text-white text-[12px] font-semibold whitespace-nowrap shadow-[0_0_12px_rgba(139,92,246,0.25)]">
+                <span>🔥</span>
+                <span>Football</span>
+              </button>
+
+              <button className="flex items-center space-x-2 px-3.5 py-2 rounded-xl bg-[#0F1524] border border-[#1D273F] text-gray-300 text-[12px] font-semibold whitespace-nowrap">
+                <span>🏀</span>
+                <span>NBA</span>
+              </button>
+
+              <button className="flex items-center space-x-2 px-3.5 py-2 rounded-xl bg-[#0F1524] border border-[#1D273F] text-gray-300 text-[12px] font-semibold whitespace-nowrap">
+                <span className="text-[11px] font-black italic text-red-500">F1</span>
+                <span>F1</span>
+              </button>
+
+              <button className="flex items-center space-x-2 px-3.5 py-2 rounded-xl bg-[#0F1524] border border-[#1D273F] text-gray-300 text-[12px] font-semibold whitespace-nowrap">
+                <span>🏏</span>
+                <span>Cricket</span>
+              </button>
+
+              <button className="p-2 rounded-xl bg-[#0F1524] border border-[#1D273F] text-gray-400">
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </section>
+
+          {/* 7. PROMOTIONAL CARD */}
+          <section className="px-5 pt-2 pb-5 select-none">
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#281D63] via-[#33207E] to-[#451A8D] border border-purple-400/30 p-4 flex items-center justify-between shadow-lg">
+              <div className="flex items-center space-x-3.5 relative z-10">
+                <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-500 flex items-center justify-center border border-white/20 shrink-0 shadow-inner">
+                  <Sparkles className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h4 className="text-[13px] font-extrabold text-white tracking-tight">Smarter Predictions. Better Insights.</h4>
+                  <p className="text-[11px] text-purple-200/80 font-medium">Make predictions and earn Fan Points</p>
+                </div>
+              </div>
+              <div className="text-purple-300 relative z-10"><ChevronRight className="w-5 h-5" /></div>
+            </div>
+          </section>
+        </div>
+      )}
+
+      {/* ===================== VIEW 2: GAMES PAGE (FIGMA SCREENSHOT 1) ===================== */}
       {activeTab === 'games' && (
         <div className="flex flex-col space-y-4 select-none">
           {/* Title Header: [1] GAMES + Subtitle */}
@@ -428,268 +890,9 @@ export default function FanAtlasApp() {
         </div>
       )}
 
-      {/* ===================== VIEW 2: HOME PAGE (PREVIOUS FIGMA DESIGN) ===================== */}
-      {activeTab === 'home' && (
-        <div className="flex flex-col space-y-1 select-none">
-          {/* Search Bar */}
-          <section className="px-5 py-2">
-            <div className="flex items-center w-full bg-[#0F1422] border border-[#1B2338] rounded-2xl px-3.5 py-2.5 shadow-inner">
-              <Search className="w-4 h-4 text-gray-400 shrink-0 mr-2.5 stroke-[2]" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search teams, leagues, players..."
-                className="w-full bg-transparent text-[13px] text-gray-200 placeholder-gray-400 focus:outline-none"
-              />
-            </div>
-          </section>
-
-          {/* MY SPORTS */}
-          <section className="px-5 py-2.5 select-none">
-            <div className="flex items-center justify-between mb-2.5">
-              <h2 className="text-[12px] font-bold tracking-wider text-gray-400 uppercase">
-                MY SPORTS
-              </h2>
-              <span className="text-[12px] font-semibold text-purple-400 cursor-pointer">
-                Edit
-              </span>
-            </div>
-
-            <div className="flex items-center space-x-2.5 overflow-x-auto no-scrollbar pb-1">
-              <button
-                onClick={() => setSelectedSportHome('football')}
-                className={`flex flex-col items-center justify-center min-w-[76px] h-[70px] rounded-2xl p-2 transition-all border ${
-                  selectedSportHome === 'football'
-                    ? 'bg-[#5533EB] border-indigo-400/60 shadow-[0_0_20px_rgba(85,51,235,0.45)] text-white'
-                    : 'bg-[#0E1424] border-[#1A2338] text-gray-300'
-                }`}
-              >
-                <div className="w-8 h-8 flex items-center justify-center mb-0.5">
-                  <span className="text-[17px] leading-none">⚽</span>
-                </div>
-                <span className="text-[11px] font-medium tracking-tight whitespace-nowrap">
-                  Football
-                </span>
-              </button>
-
-              <button
-                onClick={() => setSelectedSportHome('basketball')}
-                className={`flex flex-col items-center justify-center min-w-[76px] h-[70px] rounded-2xl p-2 transition-all border ${
-                  selectedSportHome === 'basketball'
-                    ? 'bg-[#5533EB] border-indigo-400/60 shadow-[0_0_20px_rgba(85,51,235,0.45)] text-white'
-                    : 'bg-[#0E1424] border-[#1A2338] text-gray-300'
-                }`}
-              >
-                <div className="w-8 h-8 flex items-center justify-center mb-0.5">
-                  <span className="text-[17px] leading-none">🏀</span>
-                </div>
-                <span className="text-[11px] font-medium tracking-tight whitespace-nowrap">
-                  Basketball
-                </span>
-              </button>
-
-              <button
-                onClick={() => setSelectedSportHome('f1')}
-                className={`flex flex-col items-center justify-center min-w-[76px] h-[70px] rounded-2xl p-2 transition-all border ${
-                  selectedSportHome === 'f1'
-                    ? 'bg-[#5533EB] border-indigo-400/60 shadow-[0_0_20px_rgba(85,51,235,0.45)] text-white'
-                    : 'bg-[#0E1424] border-[#1A2338] text-gray-300'
-                }`}
-              >
-                <div className="w-8 h-8 flex items-center justify-center mb-0.5">
-                  <span className="text-[13px] font-black text-red-500 italic tracking-tighter">F1</span>
-                </div>
-                <span className="text-[11px] font-medium tracking-tight whitespace-nowrap">
-                  Formula 1
-                </span>
-              </button>
-
-              <button
-                onClick={() => setSelectedSportHome('cricket')}
-                className={`flex flex-col items-center justify-center min-w-[76px] h-[70px] rounded-2xl p-2 transition-all border ${
-                  selectedSportHome === 'cricket'
-                    ? 'bg-[#5533EB] border-indigo-400/60 shadow-[0_0_20px_rgba(85,51,235,0.45)] text-white'
-                    : 'bg-[#0E1424] border-[#1A2338] text-gray-300'
-                }`}
-              >
-                <div className="w-8 h-8 flex items-center justify-center mb-0.5">
-                  <span className="text-[17px] leading-none">🏏</span>
-                </div>
-                <span className="text-[11px] font-medium tracking-tight whitespace-nowrap">
-                  Cricket
-                </span>
-              </button>
-
-              <button
-                onClick={() => setSelectedSportHome('more')}
-                className={`flex flex-col items-center justify-center min-w-[70px] h-[70px] rounded-2xl p-2 transition-all border ${
-                  selectedSportHome === 'more'
-                    ? 'bg-[#5533EB] border-indigo-400/60 shadow-[0_0_20px_rgba(85,51,235,0.45)] text-white'
-                    : 'bg-[#0E1424] border-[#1A2338] text-gray-400'
-                }`}
-              >
-                <div className="w-8 h-8 flex items-center justify-center text-[15px] font-bold text-purple-400 mb-0.5">
-                  +
-                </div>
-                <span className="text-[11px] font-medium whitespace-nowrap">
-                  More
-                </span>
-              </button>
-            </div>
-          </section>
-
-          {/* LIVE NOW (37) */}
-          <section className="px-5 py-2.5 select-none">
-            <div className="flex items-center space-x-2 mb-2.5">
-              <h2 className="text-[13px] font-extrabold tracking-wider text-emerald-400 uppercase">
-                LIVE NOW
-              </h2>
-              <span className="px-1.5 py-0.2 bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 text-[10px] font-bold rounded-full">
-                37
-              </span>
-            </div>
-
-            <div className="flex items-stretch space-x-3 overflow-x-auto no-scrollbar pb-1.5">
-              {/* Liverpool vs Arsenal */}
-              <div className="flex-shrink-0 w-[138px] bg-[#0E1424] border border-[#1A243A] rounded-2xl p-3 flex flex-col justify-between shadow-lg">
-                <div className="flex items-center justify-end w-full mb-1">
-                  <span className="inline-flex items-center px-1.5 py-0.5 rounded-full bg-[#E11D48] text-white text-[9px] font-bold tracking-tight">
-                    <span className="w-1.5 h-1.5 rounded-full bg-white mr-1" />
-                    LIVE
-                  </span>
-                </div>
-                <div className="flex items-center justify-center space-x-2 my-1">
-                  <div className="w-7 h-7 rounded-full bg-red-950/30 border border-red-500/30 p-1 flex items-center justify-center">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src="https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg" alt="Liverpool" className="w-5 h-5 object-contain" />
-                  </div>
-                  <span className="text-[9px] font-bold text-gray-500">vs</span>
-                  <div className="w-7 h-7 rounded-full bg-red-950/30 border border-red-500/30 p-1 flex items-center justify-center">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src="https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg" alt="Arsenal" className="w-5 h-5 object-contain" />
-                  </div>
-                </div>
-                <div className="text-center my-0.5">
-                  <div className="text-[15px] font-black text-white tracking-wider">2 - 1</div>
-                  <div className="text-[10px] text-gray-400 truncate mt-0.5">Liverpool vs Arsenal</div>
-                </div>
-                <div className="text-center mt-1">
-                  <span className="text-[10px] font-bold text-emerald-400">78&apos;</span>
-                </div>
-              </div>
-
-              {/* Celtics vs Mavericks */}
-              <div className="flex-shrink-0 w-[138px] bg-[#0E1424] border border-[#1A243A] rounded-2xl p-3 flex flex-col justify-between shadow-lg">
-                <div className="flex items-center justify-end w-full mb-1">
-                  <span className="inline-flex items-center px-1.5 py-0.5 rounded-full bg-[#E11D48] text-white text-[9px] font-bold tracking-tight">
-                    <span className="w-1.5 h-1.5 rounded-full bg-white mr-1" />
-                    LIVE
-                  </span>
-                </div>
-                <div className="flex items-center justify-center my-1">
-                  <div className="w-8 h-8 rounded-lg bg-blue-950/40 border border-blue-500/30 p-1 flex items-center justify-center">
-                    <span className="text-[11px] font-black text-blue-400 tracking-wider">NBA</span>
-                  </div>
-                </div>
-                <div className="text-center my-0.5">
-                  <div className="text-[14px] font-black text-white tracking-wide">112 - 108</div>
-                  <div className="text-[10px] text-gray-400 truncate mt-0.5">Celtics vs Mavericks</div>
-                </div>
-                <div className="text-center mt-1">
-                  <span className="text-[10px] font-bold text-emerald-400">4th 2:45</span>
-                </div>
-              </div>
-
-              {/* Monaco GP */}
-              <div className="flex-shrink-0 w-[138px] bg-[#0E1424] border border-[#1A243A] rounded-2xl p-3 flex flex-col justify-between shadow-lg">
-                <div className="flex items-center justify-end w-full mb-1">
-                  <span className="inline-flex items-center px-1.5 py-0.5 rounded-full bg-[#E11D48] text-white text-[9px] font-bold tracking-tight">
-                    <span className="w-1.5 h-1.5 rounded-full bg-white mr-1" />
-                    LIVE
-                  </span>
-                </div>
-                <div className="flex items-center justify-center my-1">
-                  <div className="w-10 h-7 rounded-lg bg-red-950/40 border border-red-500/30 p-1 flex items-center justify-center">
-                    <span className="text-[13px] font-black italic text-red-500 tracking-tighter">F1</span>
-                  </div>
-                </div>
-                <div className="text-center my-0.5">
-                  <div className="text-[14px] font-black text-emerald-400 tracking-wider">Q2</div>
-                  <div className="text-[10px] text-gray-400 truncate mt-0.5">Monaco Grand Prix</div>
-                </div>
-                <div className="text-center mt-1">
-                  <span className="text-[10px] font-bold text-emerald-400 font-mono">12:34</span>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* CONTINUE LISTENING */}
-          <section className="px-5 py-2.5 select-none">
-            <div className="flex items-center justify-between mb-2">
-              <h2 className="text-[12px] font-bold tracking-wider text-gray-400 uppercase">
-                CONTINUE LISTENING
-              </h2>
-              <span className="text-gray-400"><Headphones className="w-4 h-4" /></span>
-            </div>
-
-            <div className="w-full bg-[#0D1322] border border-[#1B253B] rounded-2xl p-3 flex items-center justify-between shadow-md">
-              <div className="flex items-center space-x-3 flex-1 min-w-0 mr-3">
-                <div className="w-14 h-14 rounded-xl bg-gradient-to-b from-[#181D33] to-[#0A0D18] border border-white/10 flex flex-col items-center justify-between p-1.5 shrink-0 shadow-inner">
-                  <div className="flex items-center justify-center space-x-1 mt-0.5">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src="https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg" alt="" className="w-4 h-4 object-contain" />
-                    <span className="text-[8px] text-gray-500 font-bold">vs</span>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src="https://upload.wikimedia.org/wikipedia/en/c/cc/Chelsea_FC.svg" alt="" className="w-4 h-4 object-contain" />
-                  </div>
-                  <div className="flex items-end justify-center space-x-[2px] h-3 w-full px-1">
-                    {[35, 75, 50, 90, 65, 100, 70, 45, 80, 55, 30].map((h, i) => (
-                      <span key={i} className="w-[2px] rounded-full bg-gradient-to-t from-indigo-500 to-purple-400" style={{ height: `${h}%` }} />
-                    ))}
-                  </div>
-                </div>
-
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-[13px] font-bold text-white truncate tracking-tight">Arsenal vs Chelsea</h3>
-                  <p className="text-[11px] text-gray-400 truncate mb-1.5">AI Commentary</p>
-                  <div className="flex items-center space-x-2">
-                    <div className="flex-1 h-1 bg-[#1C253B] rounded-full overflow-hidden">
-                      <div className="h-full bg-[#8B5CF6] rounded-full" style={{ width: '52%' }} />
-                    </div>
-                    <span className="text-[10px] text-gray-400 font-mono tracking-tight shrink-0">12:34 / 24:15</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="w-9 h-9 rounded-full bg-transparent border border-purple-500/80 text-purple-400 flex items-center justify-center shrink-0 shadow-[0_0_10px_rgba(139,92,246,0.3)]">
-                <Play className="w-4 h-4 fill-purple-400 text-purple-400 ml-0.5" />
-              </div>
-            </div>
-          </section>
-
-          {/* PROMOTIONAL CARD */}
-          <section className="px-5 pt-2 pb-5 select-none">
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#281D63] via-[#33207E] to-[#451A8D] border border-purple-400/30 p-4 flex items-center justify-between shadow-lg">
-              <div className="flex items-center space-x-3.5 relative z-10">
-                <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-500 flex items-center justify-center border border-white/20 shrink-0 shadow-inner">
-                  <Sparkles className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <h4 className="text-[13px] font-extrabold text-white tracking-tight">Smarter Predictions. Better Insights.</h4>
-                  <p className="text-[11px] text-purple-200/80 font-medium">Make predictions and earn Fan Points</p>
-                </div>
-              </div>
-              <div className="text-purple-300 relative z-10"><ChevronRight className="w-5 h-5" /></div>
-            </div>
-          </section>
-        </div>
-      )}
-
-      {/* ===================== VIEW 3: PREDICT / LEADERBOARD / PROFILE PLACEHOLDERS ===================== */}
+      {/* ===================== VIEW 3: PREDICT / LEADERBOARD / PROFILE ===================== */}
       {activeTab === 'predict' && (
-        <div className="px-5 py-8 text-center space-y-3">
+        <div className="px-5 py-12 text-center space-y-3 select-none">
           <div className="w-12 h-12 rounded-2xl bg-purple-600/30 border border-purple-500/50 flex items-center justify-center mx-auto text-purple-300">
             <Trophy className="w-6 h-6 text-purple-400" />
           </div>
@@ -701,7 +904,7 @@ export default function FanAtlasApp() {
       )}
 
       {activeTab === 'leaderboard' && (
-        <div className="px-5 py-8 text-center space-y-3">
+        <div className="px-5 py-12 text-center space-y-3 select-none">
           <div className="w-12 h-12 rounded-2xl bg-purple-600/30 border border-purple-500/50 flex items-center justify-center mx-auto text-purple-300">
             <BarChart3 className="w-6 h-6 text-purple-400" />
           </div>
@@ -713,7 +916,7 @@ export default function FanAtlasApp() {
       )}
 
       {activeTab === 'profile' && (
-        <div className="px-5 py-8 text-center space-y-3">
+        <div className="px-5 py-12 text-center space-y-3 select-none">
           <div className="w-12 h-12 rounded-2xl bg-purple-600/30 border border-purple-500/50 flex items-center justify-center mx-auto text-purple-300">
             <User className="w-6 h-6 text-purple-400" />
           </div>
@@ -724,13 +927,14 @@ export default function FanAtlasApp() {
         </div>
       )}
 
-      {/* 9. Bottom Navigation Bar (5 tabs with smooth switching) */}
-      <nav className="fixed bottom-0 left-0 right-0 max-w-[430px] mx-auto z-40 bg-[#070A12]/95 backdrop-blur-xl border-t border-white/[0.08] pb-4 pt-2">
+      {/* 9. Bottom Navigation Bar (5 tabs with reliable button handlers and pointer events) */}
+      <nav className="fixed bottom-0 left-0 right-0 max-w-[430px] mx-auto z-50 bg-[#070A12]/95 backdrop-blur-xl border-t border-white/[0.08] pb-4 pt-2 shadow-2xl">
         <div className="flex items-center justify-around px-2">
           {/* Home */}
           <button 
-            onClick={() => setActiveTab('home')}
-            className={`flex flex-col items-center justify-center w-16 py-1 relative transition-colors ${
+            type="button"
+            onClick={() => handleTabChange('home')}
+            className={`flex flex-col items-center justify-center w-16 py-1 relative transition-colors cursor-pointer active:scale-95 ${
               activeTab === 'home' ? 'text-purple-400' : 'text-gray-400 hover:text-gray-200'
             }`}
           >
@@ -745,8 +949,9 @@ export default function FanAtlasApp() {
 
           {/* Games */}
           <button 
-            onClick={() => setActiveTab('games')}
-            className={`flex flex-col items-center justify-center w-16 py-1 relative transition-colors ${
+            type="button"
+            onClick={() => handleTabChange('games')}
+            className={`flex flex-col items-center justify-center w-16 py-1 relative transition-colors cursor-pointer active:scale-95 ${
               activeTab === 'games' ? 'text-purple-400' : 'text-gray-400 hover:text-gray-200'
             }`}
           >
@@ -761,8 +966,9 @@ export default function FanAtlasApp() {
 
           {/* Predict */}
           <button 
-            onClick={() => setActiveTab('predict')}
-            className={`flex flex-col items-center justify-center w-16 py-1 relative transition-colors ${
+            type="button"
+            onClick={() => handleTabChange('predict')}
+            className={`flex flex-col items-center justify-center w-16 py-1 relative transition-colors cursor-pointer active:scale-95 ${
               activeTab === 'predict' ? 'text-purple-400' : 'text-gray-400 hover:text-gray-200'
             }`}
           >
@@ -777,8 +983,9 @@ export default function FanAtlasApp() {
 
           {/* Leaderboard */}
           <button 
-            onClick={() => setActiveTab('leaderboard')}
-            className={`flex flex-col items-center justify-center w-16 py-1 relative transition-colors ${
+            type="button"
+            onClick={() => handleTabChange('leaderboard')}
+            className={`flex flex-col items-center justify-center w-16 py-1 relative transition-colors cursor-pointer active:scale-95 ${
               activeTab === 'leaderboard' ? 'text-purple-400' : 'text-gray-400 hover:text-gray-200'
             }`}
           >
@@ -793,8 +1000,9 @@ export default function FanAtlasApp() {
 
           {/* Profile */}
           <button 
-            onClick={() => setActiveTab('profile')}
-            className={`flex flex-col items-center justify-center w-16 py-1 relative transition-colors ${
+            type="button"
+            onClick={() => handleTabChange('profile')}
+            className={`flex flex-col items-center justify-center w-16 py-1 relative transition-colors cursor-pointer active:scale-95 ${
               activeTab === 'profile' ? 'text-purple-400' : 'text-gray-400 hover:text-gray-200'
             }`}
           >

@@ -41,7 +41,8 @@ export interface Match {
     draw?: number;
     away: number;
   };
-  odds: {
+  /** Fan-point multipliers for the match-result market. Never called odds. */
+  multipliers: {
     home: number;
     draw?: number;
     away: number;
@@ -60,19 +61,105 @@ export interface Match {
     fouls?: [number, number];
     corners?: [number, number];
   };
+  /** Built by `src/data/markets.ts`, not authored per match. */
+  markets?: MatchMarkets;
 }
+
+/**
+ * The four markets. snake_case here and sentence case in the UI, per
+ * DESIGN.md 7.7. Which markets a match carries is a property of the sport:
+ * `correct_score` and `first_scorer` are football-only, and the totals market
+ * counts goals, points, runs or overtakes depending on what is being played.
+ */
+export type MarketId = 'match_result' | 'correct_score' | 'first_scorer' | 'total_goals';
+
+/** One rung of the goal-line ladder (DESIGN.md 7.7.1). */
+export interface TotalsLine {
+  /** Always a half number so the line cannot be pushed. */
+  line: number;
+  overMultiplier: number;
+  underMultiplier: number;
+  /** Share of fans calling over at this line, 0-100. */
+  communityOver: number;
+  /** Model probability of over at this line, 0-100. */
+  modelOver: number;
+}
+
+export interface TotalsMarket {
+  /** Sentence-case unit shown under each line number: Goals, Points, Runs. */
+  unit: string;
+  /** The line closest to the model's expectation. Drives the card header. */
+  anchorLine: number;
+  lines: TotalsLine[];
+}
+
+export interface ScorelineOutcome {
+  home: number;
+  away: number;
+  multiplier: number;
+  /** Share of fans on this scoreline, 0-100. */
+  communityShare: number;
+  modelShare: number;
+}
+
+export interface ScorerOutcome {
+  id: string;
+  name: string;
+  teamShortName: string;
+  multiplier: number;
+  communityShare: number;
+  /** Player headshot when the feed has one. Falls back to an identity disc. */
+  photo?: string;
+}
+
+export interface MatchMarkets {
+  matchResult: { multipliers: { home: number; draw?: number; away: number } };
+  totals?: TotalsMarket;
+  correctScore?: { outcomes: ScorelineOutcome[] };
+  firstScorer?: { outcomes: ScorerOutcome[] };
+}
+
+/**
+ * What a fan actually called. The market is the discriminant, so an outcome can
+ * be a side, a scoreline, a player or a line-and-side without any of them
+ * having to pretend to be the others.
+ */
+export type Call =
+  | { market: 'match_result'; side: 'home' | 'draw' | 'away' }
+  | { market: 'correct_score'; home: number; away: number }
+  | { market: 'first_scorer'; playerId: string }
+  | { market: 'total_goals'; line: number; side: 'over' | 'under' };
 
 export interface Prediction {
   id: string;
   matchId: string;
   matchTitle: string;
-  predictionChoice: 'home' | 'draw' | 'away';
-  chosenTeamName: string;
-  amountWagered: number;
-  potentialPayout: number;
-  odds: number;
-  status: 'pending' | 'won' | 'lost';
+  call: Call;
+  /** Rendered label, e.g. "Over 2.5 goals". Sentence case. */
+  label: string;
+  multiplier: number;
+  /**
+   * Fan points, never money. `amountWagered` and `potentialPayout` were renamed
+   * here because store review reads gambling vocabulary in the payload, not
+   * only on the screen (DESIGN.md 10).
+   */
+  pointsCommitted: number;
+  pointsAtStake: number;
+  status: 'pending' | 'locked' | 'won' | 'lost';
   timestamp: string;
+}
+
+/** Four languages ship, two of them gated. Never a two-value toggle. */
+export type LanguageCode = 'en' | 'es' | 'pt' | 'fr';
+
+export interface SavedHighlight {
+  id: string;
+  matchId: string;
+  title: string;
+  matchTitle: string;
+  language: LanguageCode;
+  voice: string;
+  duration: string;
 }
 
 export interface UserProfile {
@@ -90,7 +177,12 @@ export interface UserProfile {
   predictionsWon: number;
   favoriteSports: SportType[];
   favoriteTeams: string[];
-  commentaryLanguage: 'en' | 'es';
+  commentaryLanguage: LanguageCode;
+  commentaryVoice: string;
+  favoritePlayers: string[];
+  /** Saved commentary moments are capped per fan and the cap is shown, never
+   *  surfaced as an error after the fact (DESIGN.md 8 Profile). */
+  highlightCap: number;
   soundEnabled: boolean;
   notificationsEnabled: boolean;
 }
@@ -104,6 +196,7 @@ export interface LeaderboardUser {
   winRate: number;
   streak: number;
   country: string;
-  badge?: string;
+  /** Tier name only. No medals, no trophy emoji (DESIGN.md 7.8). */
+  tier?: string;
   isCurrentUser?: boolean;
 }

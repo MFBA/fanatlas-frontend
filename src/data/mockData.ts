@@ -1,4 +1,4 @@
-import { Match, LeaderboardUser, UserProfile, Prediction } from '../types';
+import { Match, LeaderboardUser, UserProfile, Prediction, SavedHighlight } from '../types';
 
 export const INITIAL_USER: UserProfile = {
   id: 'usr-101',
@@ -15,7 +15,10 @@ export const INITIAL_USER: UserProfile = {
   predictionsWon: 36,
   favoriteSports: ['football', 'basketball', 'f1', 'cricket'],
   favoriteTeams: ['Arsenal', 'Celtics', 'Ferrari', 'India'],
+  favoritePlayers: ['Bukayo Saka', 'Jayson Tatum', 'Charles Leclerc'],
   commentaryLanguage: 'en',
+  commentaryVoice: 'Terrace',
+  highlightCap: 20,
   soundEnabled: true,
   notificationsEnabled: true,
 };
@@ -56,7 +59,7 @@ export const MOCK_MATCHES: Match[] = [
       draw: 15,
       away: 23,
     },
-    odds: {
+    multipliers: {
       home: 1.45,
       draw: 3.80,
       away: 5.50,
@@ -127,7 +130,7 @@ export const MOCK_MATCHES: Match[] = [
       home: 58,
       away: 42,
     },
-    odds: {
+    multipliers: {
       home: 1.35,
       away: 3.10,
     },
@@ -188,7 +191,7 @@ export const MOCK_MATCHES: Match[] = [
       home: 54,
       away: 46,
     },
-    odds: {
+    multipliers: {
       home: 1.60,
       away: 2.20,
     },
@@ -223,8 +226,10 @@ export const MOCK_MATCHES: Match[] = [
       color: '#FFCD00'
     },
     homeScore: '32/1',
-    awayScore: '(6.2)',
-    detailTime: '32/1 (6.2)',
+    // Australia have not batted yet, so there is no second score. The overs
+    // belong in detailTime, which is the clock column.
+    awayScore: undefined,
+    detailTime: '6.2 ov',
     venue: 'Melbourne Cricket Ground',
     hasAudioCommentary: true,
     audioDuration: '30:00',
@@ -236,7 +241,7 @@ export const MOCK_MATCHES: Match[] = [
       home: 65,
       away: 35,
     },
-    odds: {
+    multipliers: {
       home: 1.72,
       away: 2.10,
     },
@@ -285,7 +290,7 @@ export const MOCK_MATCHES: Match[] = [
       draw: 18,
       away: 21,
     },
-    odds: {
+    multipliers: {
       home: 1.85,
       draw: 3.50,
       away: 4.10,
@@ -333,7 +338,7 @@ export const MOCK_MATCHES: Match[] = [
       draw: 20,
       away: 31,
     },
-    odds: {
+    multipliers: {
       home: 2.10,
       draw: 3.40,
       away: 3.20,
@@ -371,7 +376,7 @@ export const MOCK_MATCHES: Match[] = [
       draw: 25,
       away: 35,
     },
-    odds: {
+    multipliers: {
       home: 2.70,
       draw: 3.10,
       away: 2.65,
@@ -407,7 +412,7 @@ export const MOCK_MATCHES: Match[] = [
       home: 68,
       away: 32,
     },
-    odds: {
+    multipliers: {
       home: 1.80,
       away: 2.00,
     }
@@ -424,7 +429,7 @@ export const LEADERBOARD_DATA: LeaderboardUser[] = [
     winRate: 88.5,
     streak: 12,
     country: 'US',
-    badge: '👑 Grand Master'
+    tier: 'Grand Master'
   },
   {
     rank: 2,
@@ -435,7 +440,7 @@ export const LEADERBOARD_DATA: LeaderboardUser[] = [
     winRate: 84.1,
     streak: 9,
     country: 'UK',
-    badge: '⚡ Apex Predictor'
+    tier: 'Apex Predictor'
   },
   {
     rank: 3,
@@ -446,7 +451,7 @@ export const LEADERBOARD_DATA: LeaderboardUser[] = [
     winRate: 81.3,
     streak: 7,
     country: 'ES',
-    badge: '🔥 Streak Legend'
+    tier: 'Streak Legend'
   },
   {
     rank: 4,
@@ -467,7 +472,7 @@ export const LEADERBOARD_DATA: LeaderboardUser[] = [
     winRate: 78.4,
     streak: 5,
     country: 'US',
-    badge: '💎 Diamond Oracle',
+    tier: 'Diamond Oracle',
     isCurrentUser: true
   }
 ];
@@ -477,24 +482,123 @@ export const INITIAL_PREDICTIONS: Prediction[] = [
     id: 'pred-1',
     matchId: 'liv-ars-01',
     matchTitle: 'Liverpool vs Arsenal',
-    predictionChoice: 'home',
-    chosenTeamName: 'Liverpool',
-    amountWagered: 250,
-    potentialPayout: 362,
-    odds: 1.45,
-    status: 'pending',
-    timestamp: 'Today 19:40'
+    call: { market: 'match_result', side: 'home' },
+    label: 'Liverpool to win',
+    multiplier: 1.45,
+    pointsCommitted: 250,
+    pointsAtStake: 362,
+    status: 'locked',
+    timestamp: 'Today 19:40',
   },
   {
     id: 'pred-2',
+    matchId: 'liv-ars-01',
+    matchTitle: 'Liverpool vs Arsenal',
+    call: { market: 'total_goals', line: 2.5, side: 'over' },
+    label: 'Over 2.5 goals',
+    multiplier: 1.62,
+    pointsCommitted: 100,
+    pointsAtStake: 162,
+    status: 'locked',
+    timestamp: 'Today 19:41',
+  },
+  {
+    id: 'pred-3',
     matchId: 'bos-dal-02',
     matchTitle: 'Celtics vs Mavericks',
-    predictionChoice: 'home',
-    chosenTeamName: 'Celtics',
-    amountWagered: 300,
-    potentialPayout: 405,
-    odds: 1.35,
+    call: { market: 'match_result', side: 'home' },
+    label: 'Celtics to win',
+    multiplier: 1.35,
+    pointsCommitted: 300,
+    pointsAtStake: 405,
+    status: 'locked',
+    timestamp: 'Today 20:15',
+  },
+  {
+    id: 'pred-4',
+    matchId: 'ars-che-05',
+    matchTitle: 'Arsenal vs Chelsea',
+    call: { market: 'correct_score', home: 2, away: 1 },
+    label: 'Correct score 2-1',
+    multiplier: 8.4,
+    pointsCommitted: 100,
+    pointsAtStake: 840,
     status: 'pending',
-    timestamp: 'Today 20:15'
-  }
+    timestamp: 'Today 17:02',
+  },
+  {
+    id: 'pred-5',
+    matchId: 'rma-bar-06',
+    matchTitle: 'Real Madrid vs Barcelona',
+    call: { market: 'first_scorer', playerId: 'rma-bar-06-p0' },
+    label: 'Kylian Mbappe first scorer',
+    multiplier: 4.99,
+    pointsCommitted: 150,
+    pointsAtStake: 749,
+    status: 'pending',
+    timestamp: 'Today 16:20',
+  },
+  {
+    id: 'pred-6',
+    matchId: 'liv-ars-01',
+    matchTitle: 'Liverpool vs Arsenal',
+    call: { market: 'total_goals', line: 1.5, side: 'over' },
+    label: 'Over 1.5 goals',
+    multiplier: 1.28,
+    pointsCommitted: 200,
+    pointsAtStake: 256,
+    status: 'won',
+    timestamp: 'Yesterday 21:10',
+  },
+  {
+    id: 'pred-7',
+    matchId: 'f1-monaco-03',
+    matchTitle: 'Monaco qualifying',
+    call: { market: 'match_result', side: 'away' },
+    label: 'Verstappen pole',
+    multiplier: 2.1,
+    pointsCommitted: 120,
+    pointsAtStake: 252,
+    status: 'lost',
+    timestamp: 'Yesterday 15:45',
+  },
+];
+
+export const SAVED_HIGHLIGHTS: SavedHighlight[] = [
+  {
+    id: 'hl-1',
+    matchId: 'liv-ars-01',
+    title: 'Szoboszlai puts Liverpool ahead',
+    matchTitle: 'Liverpool vs Arsenal',
+    language: 'en',
+    voice: 'Terrace',
+    duration: '0:42',
+  },
+  {
+    id: 'hl-2',
+    matchId: 'bos-dal-02',
+    title: 'Tatum steps back for three',
+    matchTitle: 'Celtics vs Mavericks',
+    language: 'en',
+    voice: 'Broadcast',
+    duration: '0:28',
+  },
+  {
+    id: 'hl-3',
+    matchId: 'f1-monaco-03',
+    title: 'Leclerc takes the tunnel flat out',
+    matchTitle: 'Monaco qualifying',
+    language: 'es',
+    voice: 'Analyst',
+    duration: '1:05',
+  },
+  {
+    id: 'hl-4',
+    matchId: 'ind-aus-04',
+    title: 'Bumrah removes the opener',
+    matchTitle: 'India vs Australia',
+    language: 'en',
+    voice: 'Lagos',
+    duration: '0:36',
+  },
 ];

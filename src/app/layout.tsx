@@ -1,9 +1,28 @@
 import type { Metadata, Viewport } from 'next';
+import { Archivo, JetBrains_Mono } from 'next/font/google';
+import { CallsProvider } from '@/components/markets/calls-store';
+import { FanProvider } from '@/components/profile/profile-store';
+import { PhoneFrame } from '@/components/phone-frame';
+import { BottomNav } from '@/components/ui/bottom-nav';
 import './globals.css';
 
+const archivo = Archivo({
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+  display: 'swap',
+  variable: '--font-sans',
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  weight: ['400', '500'],
+  display: 'swap',
+  variable: '--font-mono',
+});
+
 export const metadata: Metadata = {
-  title: 'FANATLAS',
-  description: 'Smarter Predictions. Better Insights.',
+  title: 'FanAtlas',
+  description: 'Live matches, AI commentary, and where the crowd disagrees with the model.',
 };
 
 export const viewport: Viewport = {
@@ -11,24 +30,21 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: '#060911',
+  themeColor: '#08070B',
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="dark">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        {/* eslint-disable-next-line @next/next/no-page-custom-font */}
-        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-      </head>
-      <body className="bg-[#060911] text-white min-h-screen antialiased flex justify-center">
-        {children}
+    <html lang="en" className={`${archivo.variable} ${jetbrainsMono.variable}`}>
+      <body className="font-sans">
+        <CallsProvider>
+          <FanProvider>
+            <PhoneFrame>
+              {children}
+              <BottomNav />
+            </PhoneFrame>
+          </FanProvider>
+        </CallsProvider>
       </body>
     </html>
   );
